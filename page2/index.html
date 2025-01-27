@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Response Viewer with Button</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #response-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: auto;
+            word-break: break-word;
+            max-height: 400px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Response Viewer</h1>
+    <button id="fetch-data-button">Fetch API Data</button>
+    <div id="response-container">Click the button to fetch data.</div>
+
+    <script>
+        // APIエンドポイントとリクエストデータ
+        const apiUrl = 'http://localhost:5001/api/file_list';
+        const requestData = {
+            project_id: 7,
+            category_id: 'all'
+        };
+
+        // ボタンとレスポンスを表示するコンテナ
+        const fetchDataButton = document.getElementById('fetch-data-button');
+        const responseContainer = document.getElementById('response-container');
+
+        // APIを呼び出してレスポンスを表示
+        async function fetchApiData() {
+            responseContainer.textContent = "Fetching data...";
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const jsonResponse = await response.json();
+                // JSONを整形して表示
+                responseContainer.textContent = JSON.stringify(jsonResponse, null, 4);
+            } catch (error) {
+                responseContainer.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        // ボタンのクリックイベントにAPI呼び出しをバインド
+        fetchDataButton.addEventListener('click', fetchApiData);
+    </script>
+</body>
+</html>
