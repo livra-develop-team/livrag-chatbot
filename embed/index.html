@@ -121,7 +121,6 @@
     const sendButton = document.getElementById('sendButton');
     const botIconUrl = 'https://livra-develop-team.github.io/livrag-chatbot/icon/icon_2.png';
 
-    // メッセージを追加する関数
     function addMessage(text, isBot) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', isBot ? 'bot' : 'human');
@@ -143,37 +142,33 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // ボタンが押されたときの処理
     sendButton.addEventListener('click', async () => {
       const userInput = chatInput.value.trim();
       if (!userInput) return;
 
-      // ユーザーメッセージを追加
       addMessage(userInput, false);
       chatInput.value = '';
 
-      // APIリクエストを送信
       try {
         const response = await fetch('http://localhost:5001/api/query_rag', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          // リクエストの情報は、Livragに登録されているデータを含める（テストチャットのリクエストと同じ）
           body: JSON.stringify({
             "question": userInput,
-            "category": "bot",
-            "project_id": 11,
-            "user_id": 4,
-            "is_complicated": false
+            "category": // category
+            "project_id": // project_id
+            "user_id": // userid,
+            "is_complicated": // true or false
           }),
         });
 
         const data = await response.json();
 
-        // 正しいプロパティ名でレスポンスを取得
         const botResponse = data.answer || 'エラーが発生しました。';
 
-        // ボットメッセージを追加
         addMessage(botResponse, true);
       } catch (error) {
         console.error('Error:', error);
