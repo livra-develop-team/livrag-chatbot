@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>（検証用）チャットボット</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+
+    .chat-header {
+      padding: 15px;
+      background-color: #0078d4;
+      color: #fff;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .message.bot {
+      text-align: left;
+    }
+
+    .message.human {
+      text-align: right;
+      justify-content: flex-end;
+    }
+
+    .message .bubble {
+      display: inline-block;
+      padding: 10px 15px;
+      border-radius: 20px;
+      background-color: #0078d4;
+      color: white;
+      max-width: 70%;
+    }
+
+    .message.human .bubble {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+      background-color: #f9f9f9;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      outline: none;
+    }
+
+    .chat-input button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      background-color: #0078d4;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background-color: #005a9e;
+    }
+
+    .bot-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-container">
+    <div class="chat-header">チャットボット</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="何か話しかけてみてください" />
+      <button id="sendButton">送信</button>
+    </div>
+  </div>
+
+  <script>
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+    const botIconUrl = 'https://livra-develop-team.github.io/livrag-chatbot/icon/icon_2.png';
+
+    // メッセージを追加する関数
+    function addMessage(text, isBot) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message', isBot ? 'bot' : 'human');
+
+      if (isBot) {
+        const icon = document.createElement('img');
+        icon.src = botIconUrl;
+        icon.alt = 'Bot Icon';
+        icon.classList.add('bot-icon');
+        messageElement.appendChild(icon);
+      }
+
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      bubble.textContent = text;
+
+      messageElement.appendChild(bubble);
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // ボタンが押されたときの処理
+    sendButton.addEventListener('click', async () => {
+      const userInput = chatInput.value.trim();
+      if (!userInput) return;
+
+      // ユーザーメッセージを追加
+      addMessage(userInput, false);
+      chatInput.value = '';
+
+      // APIリクエストを送信
+      try {
+        const response = await fetch('http://localhost:5001/api/query_rag', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "question": userInput,
+            "category": "bot",
+            "project_id": 11,
+            "user_id": 4,
+            "is_complicated": false
+          }),
+        });
+
+        const data = await response.json();
+
+        // 正しいプロパティ名でレスポンスを取得
+        const botResponse = data.answer || 'エラーが発生しました。';
+
+        // ボットメッセージを追加
+        addMessage(botResponse, true);
+      } catch (error) {
+        console.error('Error:', error);
+        addMessage('エラーが発生しました。再試行してください。', true);
+      }
+    });
+  </script>
+</body>
+
+</html>
