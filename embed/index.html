@@ -12,19 +12,20 @@
         background-color: #f4f4f4;
         font-size:16px;
       }
+
       .chat-container {
         display: flex;
         flex-direction: column;
-        width: 50vw;
-        height: 78vh;
+        width: 60vw;
+        height: 90vh;
         position: fixed;
-        bottom: 4.5em;
+        bottom: 10px;
         right: 20px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         background-color: #fff;
         border-radius: 1em;
         overflow: hidden;
-        z-index: 10000;
+        z-index: 102;
       }
 
       @media screen and (max-width: 768px){
@@ -32,6 +33,7 @@
           width:90%;
         }
       }
+
       .chat-header {
         padding: 0.25em 1em;
         background: linear-gradient(180deg, rgba(4,56,29,1) 0%, rgba(8,104,54,1) 100%);
@@ -39,22 +41,38 @@
         font-size: 1.25em;
         font-weight: bold;
         display: flex;
-        items-align: center;
+        align-items: center;
+        position: relative;
       }
+
       .chat-header-icon {
         width: 2em;
         height: 2em;
         margin-right: 0.5em;
       }
+
       .chat-header span {
         display: flex;
         align-items: center;
       }
+
+      .chat-close-button {
+        position: absolute;
+        top: 0.1em;
+        right: 0.5em;
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 1.5em;
+        cursor: pointer;
+      }
+
       .chat-messages {
         flex: 1;
         padding: 1em;
         overflow-y: auto;
       }
+
       .message .bubble {
         display: flex;
         align-items: flex-start;
@@ -75,6 +93,7 @@
         color: #6D6E72;
         max-width: 70%;
       }
+
       .message.human .bubble {
         background: linear-gradient(180deg, rgba(4,56,29,1) 0%, rgba(8,104,54,1) 100%);
         color: white;
@@ -82,7 +101,7 @@
       }
 
       .message.bot{
-        display: flex
+        display: flex;
       }
 
       .message.bot .bubble ol{
@@ -97,7 +116,7 @@
         margin: 0.5em 0;
         display:inline-block;
       }
-
+        
       .message.bot .bubble li p{
         font-size: 1em;
         display: inline;
@@ -116,6 +135,7 @@
         height: auto;
         padding: 1em 2em;
       }
+
       .chat-input textarea {
         flex: 1;
         border: none;
@@ -126,9 +146,11 @@
         font-family: inherit;
         font-style: normal;
       }
+
       .chat-input textarea::placeholder {
         color: #B0B6BC;
       }
+
       #sendButton {
         width: 3.5em;
         height: 3.5em;
@@ -139,42 +161,106 @@
         justify-content: center;
         align-items: center;
       }
+
       #sendButton img {
         width: 2.5em;
         height: 2.5em;
         rotate: -45deg;
       }
+
       .bot-icon {
         width: 2.5em;
         height: 2.5em;
         margin-right: 10px;
         border-radius: 50%;
       }
+
       .chat-footer {
         padding: 4px;
         font-size: 0.75em;
         text-align: center;
         color: #8E8090;
       }
+
       #chatbot-toggle_button {
         position: fixed;
         bottom: 10px;
-        right: 20px;
+        right: 30px;
         cursor: pointer;
-        z-index: 10001;
+        z-index: 101;
         transition: 0.3s ease;
-        border-radius: 50%;
+        width: 6em;
+        height: 6em;
+        border-radius: 50% 50% 4px 50%;
+        background: white;
+        box-shadow: 0 0 25px rgba(72, 209, 93, 0.38);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        opacity: 0.9;
+      }
+
+      .chatbot-toggle-link { 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        padding-left: 0.3em;
       }
 
       #chatbot-toggle_button:hover {
         transform: scale(1.1);
+        box-shadow: 0 0 35px rgba(72, 209, 93, 0.38);
+        opacity: 1;
       }
 
       #chatbot-toggle_button img{
-        width: 3.5em;
-        height:3.5em;
+        width: 3em;
+        height: 3em;
       }
 
+      .chatbot-toggle-text{
+        font-size: 0.8em;
+        display: inline-block;
+        color: rgb(2, 32, 16);
+        font-weight: bold;
+      }
+
+      table {
+          width: min-content;
+          border-collapse: collapse;
+          font-size: 1em;
+          min-width: 20em;
+          max-width: 100%;
+          overflow-x: auto;
+          display: block;
+          border: 2px solid #ddd;
+          border-radius: 8px;
+      }
+
+      thead {
+          background-color: #f7f7f7;
+          font-weight: bold;
+      }
+
+      thead tr {
+          border-bottom: 0.15em solid #ddd;
+      }
+
+      tbody tr {
+          border-bottom: 0.1em solid #ddd;
+      }
+
+      td, th {
+          padding: 0.8em;
+          text-align: left;
+          word-wrap: break-word;
+      }
+
+      tbody tr:hover {
+          background-color: #f0f0f0;
+      }
     `;
       const style = document.createElement('style');
       style.type = 'text/css';
@@ -190,6 +276,16 @@
 
       const header = document.createElement('div');
       header.className = 'chat-header';
+
+      // 閉じるボタンの作成
+      const closeButton = document.createElement('button');
+      closeButton.className = 'chat-close-button';
+      closeButton.textContent = '×';
+      closeButton.addEventListener('click', function() {
+        container.style.display = 'none';
+      });
+      header.appendChild(closeButton);
+
       const icon = document.createElement('img');
       icon.src = 'https://livra-develop-team.github.io/livrag-chatbot/icon/sphere_circle_icon.svg';
       icon.alt = 'チャットボットアイコン';
@@ -235,13 +331,13 @@
       return container;
     }
 
-    // トグルボタンを作成する関数
     function createToggleButton() {
       const toggleBtn = document.createElement('div');
       toggleBtn.id = 'chatbot-toggle_button';
 
       const link = document.createElement('a');
       link.href = '#';
+      link.className = 'chatbot-toggle-link';
       link.addEventListener('click', function(e) {
         e.preventDefault();
         toggleChatWidget();
@@ -250,12 +346,18 @@
       const img = document.createElement('img');
       img.src = 'https://livra-develop-team.github.io/livrag-chatbot/icon/sphere_circle_icon.svg';
       img.alt = 'チャットボット';
+      img.className = 'chatbot-toggle-icon';
+
+      const text = document.createElement('span');
+      text.textContent = 'Chatで相談';
+      text.className = 'chatbot-toggle-text';
+
       link.appendChild(img);
+      link.appendChild(text);
       toggleBtn.appendChild(link);
       document.body.appendChild(toggleBtn);
     }
 
-    // チャットウィジェットの表示／非表示を切り替える関数
     function toggleChatWidget() {
       const widget = document.querySelector('.chat-container');
       if (widget.style.display === 'none' || widget.style.display === '') {
@@ -264,11 +366,9 @@
         widget.style.display = 'none';
       }
     }
-
-    // チャット履歴を保存する変数（各発言は { role: 'user' | 'assistant', content: '...' } の形式）
     let chatHistory = [];
 
-    // ※ 既存の linkify 関数は markdown-it の linkify 機能に置き換えられるため、必要に応じて残す
+    // マークダウンのリンク形式をHTMLのリンクに変換
     function linkify(text) {
       const urlPattern = /(\bhttps?:\/\/[^\s]+)/gi;
       return text.replace(urlPattern, function(url) {
@@ -276,16 +376,13 @@
       });
     }
 
-    // markdown-it をインスタンス化（linkify オプションを有効に）
-    const md = (window.markdownit) ?
+    const markdown = (window.markdownit) ?
       window.markdownit({
         linkify: true,
         breaks: true
       }) :
       null;
 
-    // ユーザーやボットの発言をチャット画面に追加する関数
-    // ※ ユーザー発言は単純にテキストを設定
     function addMessage(text, isBot) {
       const messages = document.getElementById('chatMessages');
       const messageEl = document.createElement('div');
@@ -301,7 +398,6 @@
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      // ユーザーの場合はテキストそのまま（HTMLエスケープ済み）
       bubble.textContent = text;
       bubble.innerHTML = text.replace(/\n/g, '<br>');
       messageEl.appendChild(bubble);
@@ -310,30 +406,22 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
-    // イベントリスナーを設定する関数
     function setupEventListeners() {
       const sendButton = document.getElementById('sendButton');
       const chatInput = document.getElementById('chatInput');
-
       sendButton.addEventListener('click', async function() {
         const userInput = chatInput.value.trim();
         if (!userInput) return;
-
-        // ユーザーの発言を画面に追加し、チャット履歴に保存
         addMessage(userInput, false);
         chatHistory.push({
           role: 'user',
           content: userInput
         });
         chatInput.value = '';
-
-        // ボットのレスポンス表示用の変数
         let currentBotMessage = null;
-        // ボットの回答を累積する変数
         let cumulativeContent = "";
 
         try {
-          // リクエストにチャット履歴を含めるため、プロンプトを組み立てる
           const prompt = `
             ## 会話履歴
             ${JSON.stringify(chatHistory, null, 2)}
@@ -361,14 +449,12 @@
             })
           });
 
-          // ステータスエラーチェック
           if (!response.ok) {
             console.error("Network response was not ok:", response.statusText);
             addMessage('エラーが発生しました。', true);
             return;
           }
 
-          // レスポンスボディをストリーミングで読み込み
           const reader = response.body.getReader();
           const decoder = new TextDecoder("utf-8");
           let buffer = "";
@@ -383,20 +469,15 @@
             buffer += decoder.decode(value, {
               stream: true
             });
-            // SSE は "\n\n" で区切られているので分割する
             const parts = buffer.split("\n\n");
-            buffer = parts.pop(); // 不完全な部分は次回へ
+            buffer = parts.pop();
 
             for (const part of parts) {
               if (!part.startsWith("data: ")) continue;
 
-              // "data: " を除去
               const message = part.replace(/^data:\s*/, "").trim();
 
-              // 終了メッセージの場合
               if (message === "[DONE]") {
-                console.log("Streaming complete.");
-                // ボットの最終回答をチャット履歴に保存
                 chatHistory.push({
                   role: 'assistant',
                   content: cumulativeContent
@@ -406,14 +487,8 @@
 
               try {
                 const parsed = JSON.parse(message);
-
-                if (parsed.type === "metadata") {
-                  console.log("Received metadata:", parsed.content);
-                } else if (parsed.type === "content") {
-                  console.log("Received content:", parsed.content);
+                if (parsed.type === "content") {
                   cumulativeContent += parsed.content;
-
-                  // ストリーミングの場合、最初のチャンクで吹き出しを生成、以降は追記
                   if (!currentBotMessage) {
                     currentBotMessage = document.createElement('div');
                     currentBotMessage.classList.add('message', 'bot');
@@ -426,11 +501,9 @@
 
                     const bubble = document.createElement('div');
                     bubble.className = 'bubble';
-                    // dataset.raw に生テキストを保持
                     bubble.dataset.raw = parsed.content;
-                    // Markdown-it を使って Markdown をレンダリング
-                    if (md) {
-                      bubble.innerHTML = md.render(bubble.dataset.raw);
+                    if (markdown) {
+                      bubble.innerHTML = markdown.render(bubble.dataset.raw);
                     } else {
                       bubble.innerHTML = linkify(bubble.dataset.raw);
                     }
@@ -440,8 +513,8 @@
                   } else {
                     const bubble = currentBotMessage.querySelector('.bubble');
                     bubble.dataset.raw = (bubble.dataset.raw || "") + parsed.content;
-                    if (md) {
-                      bubble.innerHTML = md.render(bubble.dataset.raw);
+                    if (markdown) {
+                      bubble.innerHTML = markdown.render(bubble.dataset.raw);
                     } else {
                       bubble.innerHTML = linkify(bubble.dataset.raw);
                     }
@@ -452,27 +525,22 @@
               }
             }
           }
+
         } catch (error) {
           console.error('Error:', error);
           addMessage('エラーが発生しました。再試行してください。', true);
         }
       });
-
-      // 修正：テキストエリアにフォーカスがある状態でのキー操作
-      // Enter 単体なら改行、Shift+Enter なら送信
       chatInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
           if (e.shiftKey) {
-            // Shift + Enter の場合は送信（改行はさせない）
             e.preventDefault();
             sendButton.click();
           }
-          // Enter 単体の場合は何もしないので、通常の改行動作が行われる
         }
       });
     }
 
-    // DOMContentLoaded 後に初期化
     document.addEventListener('DOMContentLoaded', function() {
       injectStyles();
       createChatWidget();
